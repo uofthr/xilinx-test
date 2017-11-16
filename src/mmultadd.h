@@ -80,7 +80,7 @@ const double scale_pos  = 1e-16;
  *    before starting HLS accelerator
  */
 //#pragma SDS data access_pattern(A:SEQUENTIAL, B:SEQUENTIAL, C:SEQUENTIAL)
-void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int[6*N], double p[10*N]);
+void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_out[6*N], double p_mass[10*N]);
 
 
 #endif /* _MMULTADD_H_ */

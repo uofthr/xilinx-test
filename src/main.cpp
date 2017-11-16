@@ -64,8 +64,10 @@ public:
      inline uint64_t avg_cpu_cycles() { return ((tot+(calls>>1)) / calls); };
 };
 
-void janus_run_golden(REB_PARTICLE_INT_TYPE *p_int_in, REB_PARTICLE_INT_TYPE *p_int, double* p)
+void janus_run_golden(REB_PARTICLE_INT_TYPE *p_int_in, REB_PARTICLE_INT_TYPE *p_int_out, double* p_mass)
 {
+    REB_PARTICLE_INT_TYPE p_int[6*N];
+    double p[10*N];
     for(unsigned int i=0; i<6*N; i++){
         p_int[i] = p_int_in[i];
     }
@@ -82,9 +84,9 @@ void janus_run_golden(REB_PARTICLE_INT_TYPE *p_int_in, REB_PARTICLE_INT_TYPE *p_
 
         // to_double_pos();
         for(unsigned int i=0; i<N; i++){
-            p[10*i+0] = ((double)p_int[10*i+0])*scale_pos;
-            p[10*i+1] = ((double)p_int[10*i+1])*scale_pos;
-            p[10*i+2] = ((double)p_int[10*i+2])*scale_pos;
+            p[10*i+0] = ((double)p_int[6*i+0])*scale_pos;
+            p[10*i+1] = ((double)p_int[6*i+1])*scale_pos;
+            p[10*i+2] = ((double)p_int[6*i+2])*scale_pos;
         }
         // gravity();
         for(unsigned int i=0; i<N; i++){
@@ -97,7 +99,7 @@ void janus_run_golden(REB_PARTICLE_INT_TYPE *p_int_in, REB_PARTICLE_INT_TYPE *p_
                     const double dy = p[10*i+1] - p[10*j+1];
                     const double dz = p[10*i+2] - p[10*j+2];
                     const double _r = sqrt(dx*dx + dy*dy + dz*dz);
-                    const double prefact = -1/(_r*_r*_r)*p[10*j+9];
+                    const double prefact = -1/(_r*_r*_r)*p_mass[10*j+9];
 
                     p[10*i+6]    += prefact*dx;
                     p[10*i+7]    += prefact*dy;
@@ -121,6 +123,9 @@ void janus_run_golden(REB_PARTICLE_INT_TYPE *p_int_in, REB_PARTICLE_INT_TYPE *p_
         }
 
         t += dt;
+    }
+    for(unsigned int i=0; i<6*N; i++){
+        p_int_out[i] = p_int[i];
     }
 
 

@@ -128,7 +128,7 @@ static int result_check(REB_PARTICLE_INT_TYPE p_int_sw[6*N], REB_PARTICLE_INT_TY
      return 0;
 }
 
-int janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw, REB_PARTICLE_INT_TYPE* p_int_out_hw)
+void janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw, REB_PARTICLE_INT_TYPE* p_int_out_hw, long steps, double dt)
 {
     perf_counter hw_ctr, sw_ctr;
 	double p[] = {
@@ -171,10 +171,6 @@ int janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw
         p_int[6*i+5] = p[6*i+5]/scale_vel;
     }
 
-     
-    double dt = 0.01;
-    long steps = 10000;
-
     sw_ctr.start();
     janus_run_golden(p_int,p_int_out_sw,p_mass,steps,dt);
     sw_ctr.stop();
@@ -182,7 +178,8 @@ int janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw
     hw_ctr.start();
     janus_run(p_int,p_int_out_hw,p_mass,steps,dt);
     hw_ctr.stop();
-    result_check(int_out_sw,int_out_hw);
+
+    result_check(p_int_out_sw,p_int_out_hw);
 
      uint64_t sw_cycles = sw_ctr.avg_cpu_cycles();
      uint64_t hw_cycles = hw_ctr.avg_cpu_cycles();
@@ -193,27 +190,31 @@ int janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw
      std::cout << "Average number of CPU cycles running in hardware: "
                << hw_cycles << std::endl;
      std::cout << "Speed up: " << speedup << std::endl;
-
-     return 0;
 }
 
 int main(int argc, char* argv[]){
-     int test_passed = 0;
-     REB_PARTICLE_INT_TYPE* p_int = NULL;
-     REB_PARTICLE_INT_TYPE* p_int_out_sw = NULL;
-     REB_PARTICLE_INT_TYPE* p_int_out_hw = NULL;
-     p_int = (REB_PARTICLE_INT_TYPE*) sds_alloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
-     p_int_out_hw = (REB_PARTICLE_INT_TYPE*) sds_alloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
-     p_int_out_sw = (REB_PARTICLE_INT_TYPE*) malloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
+    if (argc<=2){
+        std::cout << "Usage: janus steps dt "  << std::endl;
+        return -1;
+    }
+    long steps = atoi(argv[1]);
+    double dt = atof(argv[2]);
 
-     test_passed = janus_test(p_int, p_int_out_sw, p_int_out_hw);
-     
-     std::cout << "TEST " << (test_passed ? "FAILED" : "PASSED") << std::endl;
 
-     sds_free(p_int);
-     sds_free(p_int_out_hw);
-     free(p_int_out_sw);
 
-     return (test_passed ? -1 : 0);
+    REB_PARTICLE_INT_TYPE* p_int = NULL;
+    REB_PARTICLE_INT_TYPE* p_int_out_sw = NULL;
+    REB_PARTICLE_INT_TYPE* p_int_out_hw = NULL;
+    p_int = (REB_PARTICLE_INT_TYPE*) sds_alloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
+    p_int_out_hw = (REB_PARTICLE_INT_TYPE*) sds_alloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
+    p_int_out_sw = (REB_PARTICLE_INT_TYPE*) malloc(6*sizeof(REB_PARTICLE_INT_TYPE)*N);
+
+    janus_test(p_int, p_int_out_sw, p_int_out_hw, steps, dt);
+
+    sds_free(p_int);
+    sds_free(p_int_out_hw);
+    free(p_int_out_sw);
+
+    return 0;
 }
 

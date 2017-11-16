@@ -1,50 +1,11 @@
-/*
-(c) Copyright 2013 - 2016 Xilinx, Inc. All rights reserved. 
-
-This file contains confidential and proprietary information of Xilinx, Inc. and
-is protected under U.S. and international copyright and other intellectual
-property laws.
-
-DISCLAIMER 
-This disclaimer is not a license and does not grant any rights to the materials
-distributed herewith. Except as otherwise provided in a valid license issued to
-you by Xilinx, and to the maximum extent permitted by applicable law: (1) THESE
-MATERIALS ARE MADE AVAILABLE "AS IS" AND WITH ALL FAULTS, AND XILINX HEREBY
-DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY,
-INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, OR
-FITNESS FOR ANY PARTICULAR PURPOSE; and (2) Xilinx shall not be liable (whether
-in contract or tort, including negligence, or under any other theory of
-liability) for any loss or damage of any kind or nature related to, arising
-under or in connection with these materials, including for any direct, or any
-indirect, special, incidental, or consequential loss or damage (including loss
-of data, profits, goodwill, or any type of loss or damage suffered as a result
-of any action brought by a third party) even if such damage or loss was
-reasonably foreseeable or Xilinx had been advised of the possibility of the
-same.
-
-CRITICAL APPLICATIONS
-Xilinx products are not designed or intended to be fail-safe, or for use in any
-application requiring fail-safe performance, such as life-support or safety
-devices or systems, Class III medical devices, nuclear facilities, applications
-related to the deployment of airbags, or any other applications that could lead
-to death, personal injury, or severe property or environmental damage
-(individually and collectively, "Critical Applications"). Customer assumes the
-sole risk and liability of any use of Xilinx products in Critical Applications,
-subject only to applicable laws and regulations governing limitations on product
-liability.
-
-THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS PART OF THIS FILE AT
-ALL TIMES. 
-*/
-
 #include <iostream>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
-
-#include "sds_lib.h"
 #include "janus.h"
 
+#ifndef CPUONLY
+#include "sds_lib.h"
 class perf_counter
 {
 public:
@@ -55,6 +16,10 @@ public:
      inline void stop() { tot += (sds_clock_counter() - cnt); };
      inline uint64_t avg_cpu_cycles() { return ((tot+(calls>>1)) / calls); };
 };
+#else // CPUONLY
+#define sds_alloc malloc
+#define sds_free free
+#endif // CPUONLY
 
 void janus_run_golden(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_out[6*N], double p_mass[N],long steps,double dt){
     REB_PARTICLE_INT_TYPE p_int[6*N];
@@ -117,6 +82,7 @@ void janus_run_golden(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE
 
 }
 
+#ifndef CPUONLY
 static int result_check(REB_PARTICLE_INT_TYPE p_int_sw[6*N], REB_PARTICLE_INT_TYPE p_int_hw[6*N])
 {
      for (int i=0; i<6*N; i++){
@@ -127,10 +93,10 @@ static int result_check(REB_PARTICLE_INT_TYPE p_int_sw[6*N], REB_PARTICLE_INT_TY
      }
      return 0;
 }
+#endif // CPUONLY
 
 void janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_sw, REB_PARTICLE_INT_TYPE* p_int_out_hw, long steps, double dt)
 {
-    perf_counter hw_ctr, sw_ctr;
 	double p[] = {
         0.0021709922250528,  0.0057845061154043,  -0.0001290326677066,
         -0.0003084904334499,  0.0003164862379414, 0.0000072860648107,
@@ -171,10 +137,16 @@ void janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_s
         p_int[6*i+5] = p[6*i+5]/scale_vel;
     }
 
+#ifndef CPUONLY
+    perf_counter hw_ctr, sw_ctr;
     sw_ctr.start();
+#endif // CPUONLY
     janus_run_golden(p_int,p_int_out_sw,p_mass,steps,dt);
+#ifndef CPUONLY
     sw_ctr.stop();
+#endif // CPUONLY
 
+#ifndef CPUONLY
     hw_ctr.start();
     janus_run(p_int,p_int_out_hw,p_mass,steps,dt);
     hw_ctr.stop();
@@ -190,6 +162,7 @@ void janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_s
      std::cout << "Average number of CPU cycles running in hardware: "
                << hw_cycles << std::endl;
      std::cout << "Speed up: " << speedup << std::endl;
+#endif // CPUONLY
 }
 
 int main(int argc, char* argv[]){

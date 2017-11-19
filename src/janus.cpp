@@ -49,7 +49,7 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
         // One leapfrog step
         // drift();
         for(unsigned int i=0; i<N; i++){
-            #pragma HLS unroll
+            //#pragma HLS unroll
             p_int[6*i+0] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+3]*scale_vel/scale_pos);
             p_int[6*i+1] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+4]*scale_vel/scale_pos);
             p_int[6*i+2] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+5]*scale_vel/scale_pos);
@@ -57,7 +57,7 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
 
         // to_double_pos();
         for(unsigned int i=0; i<N; i++){
-            #pragma HLS unroll
+            //#pragma HLS unroll
             p[3*i+0] = ((double)p_int[3*i+0])*scale_pos;
             p[3*i+1] = ((double)p_int[3*i+1])*scale_pos;
             p[3*i+2] = ((double)p_int[3*i+2])*scale_pos;
@@ -89,7 +89,7 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
 
         // drift();
         for(unsigned int i=0; i<N; i++){
-            #pragma HLS unroll
+            //#pragma HLS unroll
             p_int[6*i+0] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+3]*scale_vel/scale_pos);
             p_int[6*i+1] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+4]*scale_vel/scale_pos);
             p_int[6*i+2] += (REB_PARTICLE_INT_TYPE)(dt/2.*(double)p_int[6*i+5]*scale_vel/scale_pos);

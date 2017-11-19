@@ -43,7 +43,6 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
     REB_PARTICLE_INT_TYPE p_int[6*N];
     double p[3*N];  // x y z 
     for(unsigned int i=0; i<6*N; i++){
-        #pragma HLS unroll
         p_int[i] = p_int_in[i];
     }
     for(long i=0;i<steps;i++){
@@ -65,7 +64,7 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
         }
         // gravity();
         for(unsigned int i=0; i<N; i++){
-            #pragma HLS unroll region
+            #pragma HLS unroll 
             double ax = 0.;
             double ay = 0.;
             double az = 0.;
@@ -97,7 +96,6 @@ void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_
         }
     }
     for(unsigned int i=0; i<6*N; i++){
-        #pragma HLS unroll
         p_int_out[i] = p_int[i];
     }
 

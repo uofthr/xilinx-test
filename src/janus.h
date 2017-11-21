@@ -7,6 +7,7 @@
 // Scale for conversion between FP and INT
 const double scale_vel  = 1e-16; 
 const double scale_pos  = 1e-16;
+const double scale_vel_pos = 1.;
 
 // INT datatype used
 #define REB_PARTICLE_INT_TYPE int64_t

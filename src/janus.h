@@ -13,7 +13,7 @@ const double scale_vel_pos = 1.;
 #define REB_PARTICLE_INT_TYPE int64_t
 
 //#pragma SDS data access_pattern(A:SEQUENTIAL, B:SEQUENTIAL, C:SEQUENTIAL)
-void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_out[6*N], double p_mass[N],long steps, double dt);
+void janus_run(REB_PARTICLE_INT_TYPE p_int_in[6*N], REB_PARTICLE_INT_TYPE p_int_out[6*N], double p_mass[N],long steps, double dt, double dt12);
 
 
 #endif /* _JANUS_H_ */

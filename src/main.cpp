@@ -136,19 +136,20 @@ void janus_test(REB_PARTICLE_INT_TYPE* p_int, REB_PARTICLE_INT_TYPE* p_int_out_s
         p_int[6*i+4] = p[6*i+4]/scale_vel;
         p_int[6*i+5] = p[6*i+5]/scale_vel;
     }
+    double dt12 = dt/2.;
 
 #ifndef CPUONLY
     perf_counter hw_ctr, sw_ctr;
     sw_ctr.start();
 #endif // CPUONLY
-    janus_run_golden(p_int,p_int_out_sw,p_mass,steps,dt);
+    janus_run_golden(p_int,p_int_out_sw,p_mass,steps,dt,dt12);
 #ifndef CPUONLY
     sw_ctr.stop();
 #endif // CPUONLY
 
 #ifndef CPUONLY
     hw_ctr.start();
-    janus_run(p_int,p_int_out_hw,p_mass,steps,dt);
+    janus_run(p_int,p_int_out_hw,p_mass,steps,dt,dt12);
     hw_ctr.stop();
 
     result_check(p_int_out_sw,p_int_out_hw);
